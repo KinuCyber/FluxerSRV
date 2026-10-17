@@ -26,7 +26,7 @@ public class ChatListener implements Listener {
             if (!rawMessage.startsWith("!")) {
                 return; // Local chat, DO NOT SEND to Fluxer
             }
-            rawMessage = rawMessage.substring(1).trim(); // Remove '!' for Discord
+            rawMessage = rawMessage.substring(1).trim(); // Remove '!' for Fluxer
         }
 
         String format = plugin.getConfig().getString("formats.chat", "**%player_name%**: %message%");
