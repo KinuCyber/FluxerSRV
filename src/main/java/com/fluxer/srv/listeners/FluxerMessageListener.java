@@ -31,7 +31,7 @@ public class FluxerMessageListener implements FluxerListener {
         if (channelId.equals(plugin.getMainChannelId())) {
             // Translate color codes just in case, and format the message
             String formattedMessage = ChatColor.translateAlternateColorCodes('&',
-                    "&9[Discord] &f" + username + " &7" + content);
+                    "&9[Fluxer-KinuCyber] &f" + username + " &7" + content);
 
             // Broadcast to the server
             plugin.getServer().getScheduler().runTask(plugin, () -> {
