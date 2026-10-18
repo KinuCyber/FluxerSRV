@@ -1,0 +1,151 @@
+Only in decompiled_3/com/fluxer/srv: commands
+diff -r decompiled_2/com/fluxer/srv/FluxerClient.java decompiled_3/com/fluxer/srv/FluxerClient.java
+74a75
+>                 this.logger.info("[Fluxer] Received HELLO. Heartbeat interval: " + heartbeatInterval + "ms");
+diff -r decompiled_2/com/fluxer/srv/FluxerSRV.java decompiled_3/com/fluxer/srv/FluxerSRV.java
+7a8
+>  *  org.bukkit.command.CommandExecutor
+14a16
+> import com.fluxer.srv.commands.StaffChatCommand;
+22a25,27
+> import java.util.HashSet;
+> import java.util.Set;
+> import java.util.UUID;
+26a32
+> import org.bukkit.command.CommandExecutor;
+32a39
+>     private static FluxerSRV instance;
+36a44,49
+>     private String staffChannelId;
+>     private boolean ignoreCancelledChatEvents;
+>     private String staffChatPrefix;
+>     private final Set<UUID> autoStaffChat = new HashSet<UUID>();
+>     private final Set<UUID> leftStaffChat = new HashSet<UUID>();
+>     private final Set<UUID> noSoundStaffChat = new HashSet<UUID>();
+39a53
+>         instance = this;
+43a58,60
+>         this.staffChannelId = this.getConfig().getString("channels.staff");
+>         this.ignoreCancelledChatEvents = this.getConfig().getBoolean("ignore-cancelled-chat-events", false);
+>         this.staffChatPrefix = this.getConfig().getString("staff-chat-prefix", "#");
+66a84,88
+>         StaffChatCommand staffChatCommand = new StaffChatCommand(this);
+>         this.getCommand("staffchat").setExecutor((CommandExecutor)staffChatCommand);
+>         this.getCommand("joinstaffchat").setExecutor((CommandExecutor)staffChatCommand);
+>         this.getCommand("leavestaffchat").setExecutor((CommandExecutor)staffChatCommand);
+>         this.getCommand("togglestaffchatsounds").setExecutor((CommandExecutor)staffChatCommand);
+119a142,145
+>     public static FluxerSRV getInstance() {
+>         return instance;
+>     }
+> 
+129a156,179
+>     }
+> 
+>     public String getStaffChannelId() {
+>         return this.staffChannelId;
+>     }
+> 
+>     public boolean isIgnoreCancelledChatEvents() {
+>         return this.ignoreCancelledChatEvents;
+>     }
+> 
+>     public String getStaffChatPrefix() {
+>         return this.staffChatPrefix;
+>     }
+> 
+>     public Set<UUID> getAutoStaffChat() {
+>         return this.autoStaffChat;
+>     }
+> 
+>     public Set<UUID> getLeftStaffChat() {
+>         return this.leftStaffChat;
+>     }
+> 
+>     public Set<UUID> getNoSoundStaffChat() {
+>         return this.noSoundStaffChat;
+diff -r decompiled_2/com/fluxer/srv/listeners/ChatListener.java decompiled_3/com/fluxer/srv/listeners/ChatListener.java
+13a14
+> import com.fluxer.srv.commands.StaffChatCommand;
+28c29
+<     @EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)
+---
+>     @EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=false)
+29a31,53
+>         if (event.isCancelled() && !this.plugin.isIgnoreCancelledChatEvents()) {
+>             return;
+>         }
+>         String rawMessage = event.getMessage();
+>         String staffPrefix = this.plugin.getStaffChatPrefix();
+>         boolean isStaffMessage = false;
+>         if (event.getPlayer().hasPermission("fluxersrv.admin")) {
+>             if (rawMessage.startsWith(staffPrefix)) {
+>                 isStaffMessage = true;
+>                 rawMessage = rawMessage.substring(staffPrefix.length()).trim();
+>             } else if (this.plugin.getAutoStaffChat().contains(event.getPlayer().getUniqueId())) {
+>                 isStaffMessage = true;
+>             }
+>         }
+>         if (isStaffMessage) {
+>             event.setCancelled(true);
+>             String finalMsg = rawMessage;
+>             this.plugin.getServer().getScheduler().runTask((Plugin)this.plugin, () -> {
+>                 StaffChatCommand cmd = (StaffChatCommand)this.plugin.getCommand("staffchat").getExecutor();
+>                 cmd.sendStaffChatMessage(event.getPlayer(), finalMsg);
+>             });
+>             return;
+>         }
+34,36c58,61
+<         String rawMessage = event.getMessage();
+<         if (this.plugin.getConfig().getBoolean("fluxer-global-only", true)) {
+<             if (!rawMessage.startsWith("!")) {
+---
+>         if (this.plugin.getConfig().getBoolean("fluxer-global-only", false)) {
+>             if (rawMessage.startsWith("!")) {
+>                 rawMessage = rawMessage.substring(1).trim();
+>             } else {
+39d63
+<             rawMessage = rawMessage.substring(1).trim();
+diff -r decompiled_2/com/fluxer/srv/listeners/FluxerMessageListener.java decompiled_3/com/fluxer/srv/listeners/FluxerMessageListener.java
+5a6
+>  *  org.bukkit.Sound
+6a8
+>  *  org.bukkit.entity.Player
+14a17
+> import org.bukkit.Sound;
+15a19
+> import org.bukkit.entity.Player;
+39,40c43,60
+<             String formattedMessage = ChatColor.translateAlternateColorCodes((char)'&', (String)("&9[Fluxer-KinuCyber] &f" + username + " &7" + content));
+<             this.plugin.getServer().getScheduler().runTask((Plugin)this.plugin, () -> this.plugin.getServer().broadcastMessage(formattedMessage));
+---
+>             String formattedMessage = ChatColor.translateAlternateColorCodes((char)'&', (String)("&9[Discord] &f" + username + " &7" + content));
+>             this.plugin.getServer().getScheduler().runTask((Plugin)this.plugin, () -> {
+>                 for (Player p : this.plugin.getServer().getOnlinePlayers()) {
+>                     p.sendMessage(formattedMessage);
+>                 }
+>                 this.plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
+>             });
+>         } else if (channelId.equals(this.plugin.getStaffChannelId())) {
+>             String format = this.plugin.getConfig().getString("formats.discordStaffChat", "&8[&cStaff&8] &b[Discord] &f%player_name%&8: &f%message%");
+>             String mcMessage = ChatColor.translateAlternateColorCodes((char)'&', (String)format.replace("%player_name%", username).replace("%message%", content));
+>             this.plugin.getServer().getScheduler().runTask((Plugin)this.plugin, () -> {
+>                 for (Player p : this.plugin.getServer().getOnlinePlayers()) {
+>                     if (!p.hasPermission("fluxersrv.admin") || this.plugin.getLeftStaffChat().contains(p.getUniqueId())) continue;
+>                     p.sendMessage(mcMessage);
+>                     if (this.plugin.getNoSoundStaffChat().contains(p.getUniqueId())) continue;
+>                     p.playSound(p.getLocation(), Sound.valueOf((String)"NOTE_PLING"), 1.0f, 1.0f);
+>                 }
+>             });
+diff -r decompiled_2/com/fluxer/srv/logging/FluxerConsoleAppender.java decompiled_3/com/fluxer/srv/logging/FluxerConsoleAppender.java
+75c75,77
+<         message = message.replaceAll("\u001b\\[[;\\d]*m", "");
+---
+>         if ((message = message.replaceAll("\u001b\\[[;\\d]*m", "")).contains("[Discord]") || message.contains("[Staff]")) {
+>             return;
+>         }
+diff -r decompiled_2/summary.txt decompiled_3/summary.txt
+1c1
+< Summary for ../build/libs/FluxerSRV-2.0-all.jar
+---
+> Summary for /home/kinu/Downloads/FluxerSRV-3.0-all.jar
