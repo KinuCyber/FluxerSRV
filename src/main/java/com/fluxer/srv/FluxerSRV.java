@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.CommandExecutor;
 
+import com.fluxer.srv.commands.StaffChatCommand;
 
 import java.io.IOException;
 import java.util.HashSet;

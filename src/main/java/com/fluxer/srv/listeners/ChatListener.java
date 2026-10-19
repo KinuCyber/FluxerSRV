@@ -1,6 +1,7 @@
 package com.fluxer.srv.listeners;
 
 import com.fluxer.srv.FluxerSRV;
+import com.fluxer.srv.commands.StaffChatCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
