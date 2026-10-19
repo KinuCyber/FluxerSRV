@@ -3,6 +3,7 @@ version: '${version}'
 main: com.fluxer.srv.FluxerSRV
 description: A custom, lightweight plugin to bridge Minecraft and Fluxer.
 author: Oisann
+api-version: "1.21"
 
 commands:
   fluxer:
@@ -10,6 +11,14 @@ commands:
     usage: /fluxer
     permission: fluxersrv.admin
     permission-message: You do not have permission to execute this command!
+  staffchat:
+    description: Send a staff chat message
+  joinstaffchat:
+    description: Join staff chat
+  leavestaffchat:
+    description: Leave staff chat
+  togglestaffchatsounds:
+    description: Toggle staff chat sounds
 
 permissions:
   fluxersrv.admin:
