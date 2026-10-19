@@ -74,9 +74,9 @@ public class FluxerSRV extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.AdvancementListener(this), this);
 
         StaffChatCommand staffChatCommand = new StaffChatCommand(this);
-        this.getCommand("staffchat).setExecutor((CommandExecutor)staffChatCommand);
+        this.getCommand("staffchat").setExecutor((CommandExecutor)staffChatCommand);
         this.getCommand("joinstaffchat").setExecutor((CommandExecutor)staffChatCommand);
-        this.getCommand("leavestaffchat").setExecutor((commandExecutor)staffChatCommand);
+        this.getCommand("leavestaffchat").setExecutor((CommandExecutor)staffChatCommand);
         this.getCommand("togglestaffchatsounds").setExecutor((CommandExecutor)staffChatCommand);
 
         try {
@@ -168,7 +168,7 @@ public class FluxerSRV extends JavaPlugin {
         return this.autoStaffChat;
     }
 
-    public set<UUID> getLeftStaffChat() {
+    public Set<UUID> getLeftStaffChat() {
         return this.leftStaffChat;
     }
 

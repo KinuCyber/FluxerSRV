@@ -72,7 +72,7 @@ public class FluxerClient {
             case 10: // Hello
                 int heartbeatInterval = packet.getAsJsonObject("d").get("heartbeat_interval").getAsInt();
                 startHeartbeat(heartbeatInterval);
-                this.logger.info("[Fluxer] Received HELLO. Heatbeat Internal: " + heartbeatinterval + "ms");
+                this.logger.info("[Fluxer] Received HELLO. Heatbeat Internal: " + heartbeatInterval + "ms");
                 identify();
                 break;
             case 0: // Dispatch

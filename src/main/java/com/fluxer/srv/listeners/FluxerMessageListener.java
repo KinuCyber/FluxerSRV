@@ -5,7 +5,7 @@ import com.fluxer.srv.FluxerSRV;
 import com.google.gson.JsonObject;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import og.bukkit.entity.Player;
+import org.bukkit.entity.Player;
 
 public class FluxerMessageListener implements FluxerListener {
 
@@ -38,7 +38,7 @@ public class FluxerMessageListener implements FluxerListener {
             // Broadcast to the server
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
-                    p.sendMessages(formattedMessage);
+                    p.sendMessage(formattedMessage);
                 }
                 plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
             });
@@ -48,15 +48,14 @@ public class FluxerMessageListener implements FluxerListener {
                     "&8[&cStaff&8]&b[Fluxer]  &f%player_name%&8: &f%message%");
             String mcMessage = ChatColor.translateAlternateColorCodes((char)'&',
                     (String)format.replace("%player_name%", username).replace("%message%", content));
-            plugin.getServer().getScheduler().runTask((Plugin)this.plugin, () -> {
-                for (player p : plugin.getServer().getOnlinePlayers()) {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (!p.hasPermission("fluxersrv.admin") || plugin.getLeftStaffChat().contains(p.getUniqueId())) continue;
                     p.sendMessage(mcMessage);
                     if (plugin.getNoSoundStaffChat().contains(p.getUniqueId())) continue;
                     p.playSound(p.getLocation(), Sound.valueOf((String)"NOTE_PLING"), 1.0f, 1.0f);
                 }
             });
-        }
 
         } else if (channelId.equals(plugin.getConsoleChannelId())) {
             // Execute command
