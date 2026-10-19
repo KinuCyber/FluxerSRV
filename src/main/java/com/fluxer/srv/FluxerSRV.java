@@ -26,6 +26,8 @@ public class FluxerSRV extends JavaPlugin {
     private final Set<UUID> autoStaffChat    = new HashSet<UUID>();
     private final Set<UUID> leftStaffChat    = new HashSet<UUID>();
     private final Set<UUID> noSoundStaffChat = new HashSet<UUID>();
+    private final Set<UUID> teamChatEnabled  = new HashSet<UUID>();
+
 
     private com.fluxer.srv.logging.FluxerConsoleAppender consoleAppender;
 
@@ -73,6 +75,7 @@ public class FluxerSRV extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.JoinQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.AdvancementListener(this), this);
+        getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.PlayerCommandListener(this), this);
 
         StaffChatCommand staffChatCommand = new StaffChatCommand(this);
         this.getCommand("staffchat").setExecutor((CommandExecutor)staffChatCommand);
@@ -175,5 +178,9 @@ public class FluxerSRV extends JavaPlugin {
 
     public Set<UUID> getNoSoundStaffChat() {
         return this.noSoundStaffChat;
+    }
+
+    public Set<UUID> getTeamChatEnabled() {
+        return teamChatEnabled;
     }
 }

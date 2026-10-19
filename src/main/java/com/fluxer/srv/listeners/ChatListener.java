@@ -17,6 +17,9 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
+        if (plugin.getTeamChatEnabled().contains(event.getPlayer().getUniqueId())) {
+            return;
+        }
         if (event.isCancelled() && !plugin.isIgnoreCancelledChatEvents()) {
             return;
         }
