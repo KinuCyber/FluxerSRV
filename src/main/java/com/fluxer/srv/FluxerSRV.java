@@ -2,26 +2,45 @@ package com.fluxer.srv;
 
 import okhttp3.OkHttpClient;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.command.CommandExecutor;
+
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class FluxerSRV extends JavaPlugin {
 
     private FluxerClient fluxerClient;
     private OkHttpClient httpClient;
+    private static FluxerSRV instance;
 
     private String mainChannelId;
     private String consoleChannelId;
+    private String staffChannelId;
+    private boolean ignoreCancelledChatEvents;
+    private String staffChatPrefix;
+
+    private final Set<UUID> autoStaffChat    = new HashSet<UUID>();
+    private final Set<UUID> leftStaffChat    = new HashSet<UUID>();
+    private final Set<UUID> noSoundStaffChat = new HashSet<UUID>();
 
     private com.fluxer.srv.logging.FluxerConsoleAppender consoleAppender;
 
+
     @Override
     public void onEnable() {
+        instance = this;
         saveDefaultConfig();
 
         String token = getConfig().getString("botToken");
         mainChannelId = getConfig().getString("channels.global");
         consoleChannelId = getConfig().getString("channels.console");
+
+        this.staffChannelId = this.getConfig().getString("channels.staff");
+        this.ignoreCancelledChatEvents = this.getConfig().getBoolean("ignore-cancelled-chat-events", false);
+        this.staffChatPrefix = this.getConfig().getString("staff-chat-prefix", "#");
 
         if (token == null || token.isEmpty() || token.equals("Bot Token_Here")) {
             getLogger().severe("Bot token is not set! Please configure it in config.yml");
@@ -53,6 +72,12 @@ public class FluxerSRV extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.JoinQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new com.fluxer.srv.listeners.AdvancementListener(this), this);
+
+        StaffChatCommand staffChatCommand = new StaffChatCommand(this);
+        this.getCommand("staffchat).setExecutor((CommandExecutor)staffChatCommand);
+        this.getCommand("joinstaffchat").setExecutor((CommandExecutor)staffChatCommand);
+        this.getCommand("leavestaffchat").setExecutor((commandExecutor)staffChatCommand);
+        this.getCommand("togglestaffchatsounds").setExecutor((CommandExecutor)staffChatCommand);
 
         try {
             fluxerClient.setListener(new com.fluxer.srv.listeners.FluxerMessageListener(this));
@@ -111,6 +136,10 @@ public class FluxerSRV extends JavaPlugin {
         }
     }
 
+    public static FluxerSRV getInstance() {
+        return instance;
+    }
+
     public FluxerClient getFluxerClient() {
         return fluxerClient;
     }
@@ -121,5 +150,29 @@ public class FluxerSRV extends JavaPlugin {
 
     public String getConsoleChannelId() {
         return consoleChannelId;
+    }
+
+    public String getStaffChannelId() {
+        return this.staffChannelId;
+    }
+
+    public boolean isIgnoreCancelledChatEvents() {
+        return this.ignoreCancelledChatEvents;
+    }
+
+    public String getStaffChatPrefix() {
+        return this.staffChatPrefix;
+    }
+
+    public Set<UUID> getAutoStaffChat() {
+        return this.autoStaffChat;
+    }
+
+    public set<UUID> getLeftStaffChat() {
+        return this.leftStaffChat;
+    }
+
+    public Set<UUID> getNoSoundStaffChat() {
+        return this.noSoundStaffChat;
     }
 }

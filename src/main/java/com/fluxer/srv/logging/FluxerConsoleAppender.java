@@ -74,7 +74,9 @@ public class FluxerConsoleAppender extends AbstractAppender {
         }
 
         // Strip ANSI color codes
-        message = message.replaceAll("\u001B\\[[;\\d]*m", "");
+        if ((message = message.replaceAll("\u001B\\[[;\\d]*m", "")).contains("[Fluxer]") || message.contains("[Staff]")) {
+            return
+        }
         messageQueue.add(message);
     }
 
