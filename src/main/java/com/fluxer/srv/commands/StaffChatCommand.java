@@ -86,7 +86,7 @@ implements CommandExecutor {
             if (!p.hasPermission("fluxersrv.admin") || this.plugin.getLeftStaffChat().contains(p.getUniqueId())) continue;
             p.sendMessage(mcMessage);
             if (this.plugin.getNoSoundStaffChat().contains(p.getUniqueId())) continue;
-            p.playSound(p.getLocation(), Sound.valueOf((String)"NOTE_PLING"), 1.0f, 1.0f);
+            //p.playSound(p.getLocation(), Sound.valueOf((String)"NOTE_PLING"), 1.0f, 1.0f);
         }
     }
 }

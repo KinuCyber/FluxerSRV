@@ -53,7 +53,7 @@ public class FluxerMessageListener implements FluxerListener {
                     if (!p.hasPermission("fluxersrv.admin") || plugin.getLeftStaffChat().contains(p.getUniqueId())) continue;
                     p.sendMessage(mcMessage);
                     if (plugin.getNoSoundStaffChat().contains(p.getUniqueId())) continue;
-                    p.playSound(p.getLocation(), Sound.valueOf((String)"NOTE_PLING"), 1.0f, 1.0f);
+                    //p.playSound(p.getLocation(), Sound.valueOf((String)"NOTE_PLING"), 1.0f, 1.0f);
                 }
             });
 
